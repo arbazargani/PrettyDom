@@ -1,5 +1,8 @@
 <?php
-    function CropByCords($temp_image, $cropWidth = 480, $cropHeight = 240) {
+    function SetMaxLength($string, $max_length, $etc_dots = false) {
+        return ($etc_dots) ? substr($string, 0, $max_length-4) . ' ...' : substr($string, 0, $max_length);
+    }
+    function CentrizedCrop($temp_image, $cropWidth = 480, $cropHeight = 240) {
         $width  = imagesx($temp_image);
         $height = imagesy($temp_image);
         $centreX = round($width / 2);
@@ -18,7 +21,7 @@
 
         $final_image = imagecrop($temp_image, ['x' => $x1, 'y' => $y1, 'width' => $x2, 'height' => $y2]);
         if ($final_image !== FALSE) {
-            imagepng($final_image, 'src/cover-240-480.jpg');
+            imagepng($final_image, 'src/cover-480-240.jpg');
             imagedestroy($final_image);
         }
         imagedestroy($temp_image);
