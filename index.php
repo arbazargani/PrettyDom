@@ -1,36 +1,73 @@
-<?php
-    require_once('helpers.php');
-
-    $destination = 'https://www.rokna.net/%D8%A8%D8%AE%D8%B4-%D8%B3%DB%8C%D8%A7%D8%B3%DB%8C-74/628937-%D8%B1%D9%88%D8%AD%D8%A7%D9%86%DB%8C-%D9%81%D8%B9%D9%84%D8%A7-%D8%A8%D9%87-%D8%AF%D9%86%D8%A8%D8%A7%D9%84-%D8%AA%D8%B3%D9%88%DB%8C%D9%87-%D8%AD%D8%B3%D8%A7%D8%A8-%D8%B3%DB%8C%D8%A7%D8%B3%DB%8C-%D8%AC%D9%86%D8%A7%D8%AD%DB%8C-%D9%86%D8%A8%D8%A7%D8%B4%DB%8C%D8%AF-%D8%B4%D9%87%D8%B1%D9%87%D8%A7%DB%8C%DB%8C-%DA%A9%D9%87-%D9%88%D8%B6%D8%B9%DB%8C%D8%AA-%D9%82%D8%B1%D9%85%D8%B2-%D8%AF%D8%A7%D8%B1%D9%86%D8%AF-%D8%AA%D8%B9%D8%B7%DB%8C%D9%84-%D9%85%DB%8C-%D8%B4%D9%88%D9%86%D8%AF';
-    $source = file_get_contents($destination);
-    file_put_contents('src/destination.txt', $source);
-    $source = file_get_contents('src/destination.txt');
-
-    if(preg_match("/<title>(.+)<\/title>/i", $source, $matches)) {
-        $title = $matches[1];
-        $title = SetMaxLength($lead, 70, false);
-    } else {
-        print "The page doesn't have a title tag.";
-        die();
+<?php 
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        require_once('application_handler.php');
     }
+?>
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanjagh QuickPush</title>
 
-    if(preg_match_all('/<img src="([^"]*)"/i' , $source, $matches)) {
-        $cover = $matches[1][1];
-        copy ($cover, 'src/cover.jpg');
-        $temp_image = imagecreatefromjpeg('src/cover.jpg');
-        CentrizedCrop($temp_image, 480, 240);
-    } else {
-        print "The page doesn't have a image tag.";
-        die();
-    }
-
-    if(preg_match_all('/<p>(.+)<\/p>/i', $source, $matches)) {
-        $lead = trim(strip_tags($matches[0][0]));
-        $lead = SetMaxLength($lead, 150, true);
-    } else {
-        print "The page doesn't have laed.";
-        die();
-    }
-
-
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .btn-text {
+            border: none;
+            background: none;
+            color: darkgray;
+            transition: 0.5s color;
+        }
+        .btn-text:hover {
+            color: red;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <div class="row">
+            <div class="col-5">
+                <?php if(isset($has_error) && $has_error): ?>
+                <div class="alert alert-danger" role="alert">
+                    <span><?php echo $error_message; ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if(isset($has_not_error) && $has_not_error): ?>
+                <div class="alert alert-success" role="alert">
+                    <span><?php echo $success_message; ?></span>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <?php endif; ?>
+                <form class="mt-5" method="POST">
+                    <div class="form-group">
+                        <label for="url">Destination URL</label>
+                        <input type="text" class="form-control" name="url" id="url" aria-describedby="urlHelp" placeholder="https://www.rokna.net/fa/...">
+                        <small id="urlHelp" class="form-text text-muted">The page you want to quick push.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="src">Custom image Address</label>
+                        <input type="password" name="src" id="src" class="form-control" id="exampleInputPassword1" placeholder="*/image.jpg">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="image_auto_crop" id="image_auto_crop" checked>
+                        <label class="form-check-label" for="image_auto_crop">Image auto crop</label>
+                    </div>
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary">Handle job!</button>
+                        <input type="reset" class="btn-text ml-3" value="reset">
+                    </div>
+                </form>
+            </div>
+            <div class="col-5">
+            <img src="https://www.appice.io/wp-content/uploads/2020/05/people-get-chat-messages-notification-mobile-phone-people-turn-notification-social-media-up-date-can-use-landing-page-template-ui-web-homepage-poster-banner-flyer_78434-32.jpg" alt="push-notif">
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>
